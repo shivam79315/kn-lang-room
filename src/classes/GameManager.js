@@ -27,7 +27,6 @@ export default class GameManager {
 
         console.log(`\nWelcome, ${this.player.name}, to KN-Land! Your adventure begins now...`);
 
-        console.log("\nYou find yourself at the entrance of a mysterious place.");
         this.showInstructions();
 
         while(this.player.isAlive) {
@@ -38,11 +37,12 @@ export default class GameManager {
     }
 
     showInstructions() {
-        console.log("\n=== KN-Lang Adventure Commands ===");
-        console.log("  go <direction>   → move north, south, east, or west");
+        console.log("\n=== KN-Lang Game Commands ===");
         console.log("  look             → inspect your current surroundings");
+        console.log("  go <direction>   → move north, south, east, or west");
         console.log("  pick <item>      → pick up an item in the room");
         console.log("  inventory        → view your collected items");
+        console.log("  score            → view your current score");
         console.log("  quit             → end the game dramatically");
         console.log("==================================\n");
     }
@@ -57,7 +57,7 @@ export default class GameManager {
             console.log(`You move ${direction} to the ${nextRoomName}.`);
             this.player.currentRoom.showDetails();
         } else {
-            console.log("You can't go that way! Try a different direction.");
+            console.log("You can't go that way! Try a different direction.\n");
         }
     }
 
@@ -66,20 +66,55 @@ export default class GameManager {
 
         switch (action) {
             case "go":
-            this.movePlayer(target);
-            break;
+                this.movePlayer(target);
+                break;
+
             case "look":
-            this.player.currentRoom.showDetails();
-            break;
+                this.player.currentRoom.showDetails();
+                break;
+
+            case "pick":
+                if (!target) {
+                    console.log("Pick what? You must name the item, hero.");
+                    break;
+                }
+                this.pickUpItemCheck(target);
+                break;
+
+            case "inventory":
+                this.player.showInventory();
+                break;
+
+            case "score":
+                this.player.showScore();
+                break;
+
             case "help":
-            this.showInstructions();
-            break;
+                this.showInstructions();
+                break;
+
             case "quit":
-            console.log("Farewell, adventurer! May your code always compile.");
-            this.player.isAlive = false;
-            break;
+                console.log("Farewell, adventurer! May your code always compile :)");
+                this.player.isAlive = false;
+                break;
+
             default:
-            console.log("The universe tilts its head. That command makes no sense.");
+                console.log("\n This command makes no sense. Type 'help' for a list of valid commands.");
+        }
+    }
+
+    // helper fns
+    pickUpItemCheck(itemName) {
+        const currentRoom = this.player.currentRoom;
+        const currentItems = currentRoom.items;
+
+        const itemIndex = currentItems.indexOf(itemName);
+
+        if (itemIndex !== -1) {
+            this.player.pickUpItem(itemName);
+            currentItems.splice(itemIndex, 1);
+        } else {
+            console.log(`There is no "${itemName}" here. Maybe try 'look'? 👀`);
         }
     }
 }
